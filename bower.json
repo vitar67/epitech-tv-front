@@ -1,0 +1,30 @@
+{
+  "name": "tv-front",
+  "authors": [
+    "Victor « Magic Bit-Bot » Schubert <sqrt.minusone.v67@gmail.com>",
+    "Romain Vermot <romain.vermot@epitech.eu>"
+  ],
+  "description": "The user front-end of the EPITECH TV system.",
+  "main": "",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "tv",
+    "display",
+    "polymer"
+  ],
+  "license": "GPLv2",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "~1.2.0"
+  }
+}
