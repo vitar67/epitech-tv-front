@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="horizontal-layout">
+	<template>
+		<style>
+			:host {
+				display: block;
+			}
+
+			#wrapper {
+				display: flex;
+				flex-direction: row;
+				height: 100%;
+				width: 100%;
+			}
+
+			#wrapper > ::content * {
+				flex: 1;
+				position: relative;
+				color: red;
+			}
+		</style>
+		<div id="wrapper">
+			<content></content>
+		</div>
+	</template>
+	<script>
+		'use strict';
+		Polymer({
+			is: 'horizontal-layout',
+			ready: function() {
+				console.log('<horizontal-layout> is ready.');
+			}
+		});
+	</script>
+</dom-module>
+
