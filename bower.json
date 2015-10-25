@@ -25,6 +25,7 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "~1.2.0"
+    "polymer": "~1.2.0",
+    "moment": "momentjs#~2.10.6"
   }
 }
