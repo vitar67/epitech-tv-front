@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="clock-digital">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				justify-content: center;
+				align-items: center;
+				align-content: center;
+			}
+
+			#clock {
+				text-align: center;
+			}
+
+			#major {
+				font-weight: lighter;
+				font-size: 48px;
+				margin: 0;
+			}
+			
+			#minor {
+				font-weight: normal;
+				color: rgba(0, 0, 0, 0.54);
+				vertical-align: sub;
+			}
+		</style>
+		<div id="clock">
+			<p id="time"><span id="major">13:37</span><span id="minor">55</span></p>
+			<p id="date">Jeudi 22 octobre 2015</p>
+		</div>
+	</template>
+	<script>
+		'use strict';
+		Polymer({
+			is: 'clock-digital',
+			ready: function () {
+				this._update();
+			},
+			_update: function () {
+				var now = moment();
+				var next = now;
+				var This = this;
+
+				next.endOf("second");
+				setTimeout(function () {
+					var date;
+
+					date = next.format('dddd D MMMM YYYY');
+					date = date.charAt(0).toUpperCase() + date.slice(1);
+					This.$.major.innerHTML = next.format('H:mm');
+					This.$.minor.innerHTML = next.format('ss');
+					This.$.date.innerHTML = date;
+					This._update();
+				}, next - now);
+			}
+		});
+	</script>
+</dom-module>
