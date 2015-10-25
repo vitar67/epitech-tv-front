@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="titled-module">
+	<template>
+		<style>
+			:host {
+				display: block;
+				height: 100%;
+				box-sizing: border-box;
+				padding: 8px;
+			}
+
+			#wrapper {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				position: relative;
+			}
+
+			#wrapper > ::content h1 {
+				width: 100%;
+				margin: 0;
+				margin-bottom: 8px;
+				text-align: center;
+				font-weight: lighter;
+				font-size: 24px;
+				order: 0;
+				flex: 0 0 auto;
+			}
+			
+			#wrapper > ::content * {
+				flex: 1;
+			}
+		</style>
+		<div id="wrapper">
+			<content select="h1"></content>
+			<content></content>
+		</div>
+	</template>
+	<script>
+		'use strict';
+		Polymer({
+			is: 'titled-module'
+		});
+	</script>
+</dom-module>
