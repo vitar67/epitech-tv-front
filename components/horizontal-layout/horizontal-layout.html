@@ -4,25 +4,16 @@
 	<template>
 		<style>
 			:host {
-				display: block;
-			}
-
-			#wrapper {
-				position: absolute !important;
+				/*position: absolute !important;*/
 				display: flex;
 				flex-direction: row;
-				height: 100%;
-				width: 100%;
 			}
 
-			#wrapper > ::content * {
+			:host > ::content > * {
 				flex: 1;
-				position: relative;
 			}
 		</style>
-		<div id="wrapper">
-			<content></content>
-		</div>
+		<content></content>
 	</template>
 	<script>
 		'use strict';

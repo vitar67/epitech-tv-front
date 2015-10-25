@@ -4,21 +4,14 @@
 	<template>
 		<style>
 			:host {
-				display: block;
-				height: 100%;
+				position: relative;
+				display: flex;
 				box-sizing: border-box;
 				padding: 8px;
-			}
-
-			#wrapper {
-				display: flex;
 				flex-direction: column;
-				height: 100%;
-				position: relative;
 			}
 
-			#wrapper > ::content h1 {
-				width: 100%;
+			:host > ::content h1 {
 				margin: 0;
 				margin-bottom: 8px;
 				text-align: center;
@@ -28,14 +21,12 @@
 				flex: 0 0 auto;
 			}
 			
-			#wrapper > ::content * {
+			:host > ::content :not(h1) {
 				flex: 1;
 			}
 		</style>
-		<div id="wrapper">
-			<content select="h1"></content>
-			<content></content>
-		</div>
+		<content select="h1"></content>
+		<content></content>
 	</template>
 	<script>
 		'use strict';
