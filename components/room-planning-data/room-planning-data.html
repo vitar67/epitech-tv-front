@@ -1,0 +1,76 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../momentjs/momentjs.html">
+
+<dom-module id="room-planning-data">
+	<template>
+		<style>
+		</style>
+		<iron-ajax id='ajax'
+			auto
+			url='/api/room-planning'
+			params='[[_computeRequestParameters(rooms, periodStart, periodEnd)]]'
+			handle-as='json'
+			last-response='{{_data}}'
+			debounce-duration='50'
+		></iron-ajax>
+	</template>
+	<script>
+		'use strict';
+		Polymer({
+			is: 'room-planning-data',
+			properties: {
+				rooms: { // An Array of String, each being the identifier of a room.
+					type: Array,
+					value: []
+				},
+				periodStart: { // A date which can be parsed by momentjs
+					type: String,
+					value: null
+				},
+				periodEnd: { // A date which can be parsed by momentjs
+					type: String,
+					value: null
+				},
+				refreshRate: { // A Number, representing the refresh frequency in seconds. Zero means no automatic refresh.
+					type: Number,
+					value: null,
+					observer: '_refreshRateChanged'
+				},
+				_data: { // I need this intermediate variable because roomData should be readOnly.
+					type: Object,
+					observer: '_dataChanged'
+				},
+				data: {
+					type: Object,
+					notify: true,
+					readOnly: true
+				}
+			},
+			_computeRequestParameters: function (rooms, periodStart, periodEnd) {
+				var params = {
+					start: periodStart ? moment(periodStart).format() : moment().startOf('day').format(),
+					end: periodEnd ? moment(periodEnd).format() : moment().endOf('day').add(1, 'day').format(),
+					rooms: (rooms || []).join(',')
+				};
+				return params;
+			},
+			_dataChanged: function (newData) {
+				this._setData(newData);
+			},
+			_refreshIntervalId: null,
+			_refreshRateChanged: function (newRefreshRate) {
+				if (this._refreshIntervalId !== null) {
+					clearInterval(this._refreshIntervalId);
+				}
+				if (newRefreshRate && newRefreshRate > 0) {
+					var This = this;
+					this._refreshIntervalId = setInterval(function () {
+						This.$.ajax.params = This._computeRequestParameters(This.rooms, This.periodStart, This.periodEnd);
+						This.$.ajax.generateRequest();
+					}, newRefreshRate * 1000);
+				}
+			}
+		});
+	</script>
+</dom-module>
