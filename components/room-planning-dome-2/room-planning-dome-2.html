@@ -1,0 +1,240 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../momentjs/momentjs.html">
+<link rel="import" href="../room-planning-data/room-planning-data.html">
+<!-- <link rel="import" href="../jquery-2.1.4/jquery-2.1.4.html"> -->
+
+<dom-module id="room-planning-dome-2">
+	<template>
+		<style>
+			:host {
+				padding: 8px;
+				display: flex;
+			}
+
+			svg {
+				flex: 1;
+			}
+
+			svg * {
+				transition: fill 1s;
+				vector-effect: non-scaling-stroke;
+				fill: none;
+				stroke: none;
+			}
+
+			#holes * {
+				fill: #E0E0E0;
+			}
+
+			#hallways * {
+				fill: #F5F5F5;
+			}
+
+			#rooms * {
+				fill: #81C784;
+			}
+
+			#rooms .occupied {
+				fill: #E57373;
+			}
+
+			#room-texts * {
+				fill: rgba(0, 0, 0, 0.87);
+				text-anchor: middle;
+				font-size: smaller;
+			}
+
+			#room-texts .room-name {
+				font-size: medium;
+				font-weight: bold;
+			}
+
+			#walls * {
+				stroke: rgba(0, 0, 0, 0.87);
+			}
+
+			#walls .exterior {
+				stroke-width: 2px;
+			}
+
+			#doors * {
+				stroke: rgba(0, 0, 0, 0.54);
+				stroke-width: 3px;
+			}
+		</style>
+		<room-planning-data
+			rooms="[[rooms]]"
+			data="{{data}}"
+			refresh-rate="900" />
+		</room-planning-data>
+		<svg viewbox="0 0 603.71875 756.84375">
+			<g id="hallways">
+				<path d="M 276.9715,279.97752 317.89103,255.54093 405.88483,400.2913 442.86034,400.48643 442.86034,407.03585 452.34293,407.11625 452.40493,444.62524 437.83355,452.84728 502.75083,559.63649 525.02573,559.63649 526.16218,257.33408 583.9797,257.43228 583.9999,334.38946 603.22065,334.42966 603.14025,462.56518 584.03349,462.60548 584.05479,543.95312 566.84805,543.89622 566.73474,715.79369 518.07819,715.82529 516.24169,680.5324 z"/>
+			</g>
+			<g id="holes" transform="translate(-31.28125,-36.5625)">
+				<path d="M 469.1148,489.40978 483.68618,481.18774 483.62418,443.67875 474.14159,443.59835 474.14159,437.04893 437.16608,436.8538 349.17228,292.10343 376.06203,265.712 304.20686,230.20592 305.8897,214.15739 341.6416,225.19596 557.67079,212.29766 556.30698,596.19899 534.03208,596.19899 z"/>
+				<path d="M 549.35941,752.38775 547.52291,717.09486 543.32862,710.07288 537.3053,714.09321 539.25342,752.3943 z"/>
+			</g>
+			<g id="rooms" transform="translate(-31.28125,-36.5625)">
+				<path id="D201" class$="[[_roomClass('', roomStates.D201)]]" d="M 454.35657,792.98522 522.19745,752.40559 539.25342,752.39429 537.3053,714.0932 543.32862,710.07287 431.3773,522.64729 329.32388,583.71201 z"/>
+				<path id="D202" class$="[[_roomClass('', roomStates.D202)]]" d="M 206.13423,377.52382 308.25275,316.54002 431.3773,522.64729 329.32388,583.71201 z"/>
+				<path id="D203" class$="[[_roomClass('', roomStates.D203)]]" d="M 31.865932,85.842899 38.664715,74.157283 325.03353,55.726581 336.02337,223.46131 305.8897,214.15739 304.20686,230.20592 376.06203,265.712 349.17228,292.10343 206.13423,377.52382 z"/>
+				<path id="D204" class$="[[_roomClass('', roomStates.D204)]]" d="M 615.19362,37.051875 615.26092,293.99478 557.44343,293.89658 557.67076,212.29766 341.64157,225.19596 336.02334,223.46131 325.0335,55.726581 z"/>
+			</g>
+			<g id="room-texts" transform="translate(-31.28125, -36.5625)">
+				<text class="room-name" x="436" y="628">D201</text>
+				<text x="436" y="644">[[_roomTitle(roomStates.D201)]]</text>
+				<text x="436" y="644" dy="1em">[[_roomTime(roomStates.D201)]]</text>
+				<text class="room-name" x="312.87545" y="421.89273">D202</text>
+				<text x="312.87545" y="437.89273">[[_roomTitle(roomStates.D202)]]</text>
+				<text x="312.87545" y="437.89273" dy="1em">[[_roomTime(roomStates.D202)]]</text>
+				<text class="room-name" x="190.1531425" y="149.6766215">D203</text>
+				<text x="190.1531425" y="165.6766215">[[_roomTitle(roomStates.D203)]]</text>
+				<text x="190.1531425" y="165.6766215" dy="1em">[[_roomTime(roomStates.D203)]]</text>
+				<text class="room-name" x="478.417595" y="115.1239175">D204</text>
+				<text x="478.417595" y="131.1239175">[[_roomTitle(roomStates.D204)]]</text>
+				<text x="478.417595" y="131.1239175" dy="1em">[[_roomTime(roomStates.D204)]]</text>
+			</g>
+			<g id="walls" transform="translate(-31.28125,-36.5625)">
+				<path class="exterior" d="M 454.35657,792.98523 31.865932,85.842899 38.664715,74.157283 615.19362,37.051875"/>
+				<path d="M 615.19362,37.051875 615.28112,370.95196 634.50187,370.99216 634.42147,499.12768 615.31471,499.16798 615.33601,580.51562 598.12927,580.45872 598.01596,752.35619 522.19745,752.40559 454.35657,792.98522"/>
+				<path d="M 349.17228,292.10343 376.06203,265.712 304.20686,230.20592 305.8897,214.15739 341.6416,225.19596 557.67079,212.29766 556.30698,596.19899 534.03208,596.19899 469.1148,489.40978 483.68618,481.18774 483.62418,443.67875 474.14159,443.59835 474.14159,437.04893 437.16608,436.8538 z"/>
+				<path d="M 206.13423,377.52382 308.25275,316.54002 543.32862,710.07288 547.52291,717.09486 549.35941,752.38775"/>
+				<path d="M 543.32862,710.07288 537.3053,714.09321 539.25342,752.3943"/>
+				<path d="M 329.32388,583.71201 431.3773,522.64729"/>
+				<path d="M 308.25275,316.54002 349.17228,292.10343"/>
+				<path d="M 325.03353,55.726581 336.02337,223.46131"/>
+				<path d="M 557.44346,293.89658 615.26095,293.99478"/>
+			</g>
+			<g id="doors" transform="translate(-31.28125,-36.5625)">
+				<path d="M 598.06892,671.98087 598.04582,707.4315"/>
+				<path d="M 532.33018,691.66121 542.26033,708.28497"/>
+				<path d="M 445.3517,546.05319 454.77002,561.8107"/>
+				<path d="M 407.91217,483.36727 417.86269,500.02419"/>
+				<path d="M 321.67777,339.01317 331.7369,355.85412"/>
+				<path d="M 313.33944,313.50232 342.84859,295.87985"/>
+				<path d="M 615.13998,331.64118 615.18668,364.25835"/>
+				<path d="M 615.18353,507.29804 615.18353,539.68796"/>
+				<path d="M 569.9491,752.37438 590.56721,752.36098"/>
+				<path d="M 491.36879,770.84602 508.24916,760.74889"/>
+				<path d="M 335.22959,211.3461 325.61829,64.651517"/>
+				<path d="M 508.24014,553.77112 517.84198,569.56614"/>
+				<path d="M 481.79163,510.26313 491.37995,526.036"/>
+				<path d="M 408.90804,390.36914 418.2417,405.72307"/>
+				<path d="M 565.75794,293.9107 608.75161,293.9837"/>
+			</g>
+		</svg>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'room-planning-dome-2',
+			properties: {
+				rooms: {
+					type: Array,
+					readOnly: true,
+					value: [
+						'D201',
+						'D202',
+						'D203',
+						'D204'
+					]
+				},
+				roomStates: {
+					type: Object,
+					value: {}
+				},
+				data: {
+					type: Object,
+					value: null,
+					observer: '_update'
+				},
+			},
+			ready: function () {
+				var This = this;
+
+				this._eachTime('second', function (now) {
+					This._update(null, null, now);
+				});
+			},
+			_update: function (newValue, oldValue, now) {
+				now = now || moment();
+
+				newValue = newValue || this.data;
+				if (!newValue) return;
+				for (var k in this.rooms) {
+					var room = this.rooms[k];
+					var nextEnd = getNextEnd.call(this, room);
+					var roomState = this.roomStates[room] ? this.roomStates[room] : (this.roomStates[room] = {});
+
+					if (nextEnd) {
+						this.roomStates[room] = {
+							state: now.isBetween(nextEnd.start, nextEnd.end) ? 'occupied' : 'free',
+							title: nextEnd.title,
+							start: nextEnd.start,
+							end: nextEnd.end,
+						};
+					} else {
+						this.roomStates[room] = {
+							state: 'free',
+							title: null,
+							start: null,
+							end: null,
+						};
+					}
+					this.notifyPath('roomStates.' + room, this.roomStates[room]);
+				}
+
+				function getNextEnd(room) {
+					var nextEnd = null;
+
+					this.data[room].sort(function (a, b) {
+						return moment(a.end) - moment(b.end);
+					});
+					for (var i = this.data[room].length - 1; i >= 0; --i) {
+						if (now.isBefore(this.data[room][i].end)) {
+							nextEnd = this.data[room][i];
+						} 
+					}
+					return nextEnd;
+				}
+			},
+			_roomClass: function (staticClass, roomState) {
+				if (!roomState) return staticClass;
+				staticClass = staticClass.split(/\s+/);
+				if (roomState.state === 'occupied') {
+					staticClass.push('occupied');
+				}
+				return staticClass.join(' ');
+			},
+			_roomTitle: function (roomState) {
+				if (!roomState) return '';
+				if (roomState.title === null) {
+					return '';
+				} else {
+					return roomState.title;
+				}
+			},
+			_roomTime: function (roomState) {
+				if (!roomState) return '';
+				if (roomState.state === 'occupied') {
+					return 'jusqu\'à ' + moment(roomState.end).format('H:mm');
+				} else if (roomState.state === 'free') {
+					return roomState.start ? 'à ' + moment(roomState.start).format('H:mm') : '';
+				}
+			},
+			_eachTime: function (time, callback) {
+				var now = moment();
+				var next = moment(now);
+				var This = this;
+
+				next.endOf(time);
+				setTimeout(function () {
+					callback(next);
+					This._eachTime(time, callback);
+				}, next - now);
+			}
+		});
+	</script>
+</dom-module>
