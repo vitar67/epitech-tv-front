@@ -9,6 +9,51 @@
 			:host {
 				padding: 8px;
 				display: flex;
+				position: relative;
+			}
+
+			#legend {
+				margin: 8px;
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				box-sizing: border-box;
+				padding: 0;
+
+			}
+
+			#legend li::before {
+				content: "";
+				display: inline-block;
+				margin-right: 0.5ex;
+				border: 1px solid rgba(0, 0, 0, 0.87);
+				background: #E0E0E0;
+				width: 1ex;
+				height: 1ex;
+			}
+
+			#legend li.free::before {
+				background-color: #81C784;
+				/*border-color: transparent;*/
+			}
+
+			#legend li.occupied::before {
+				background-color: #E57373;
+			}
+
+			#error {
+				margin: 8px;
+				padding: 0;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				box-sizing: border-box;
+				color: transparent;
+				transition: color 1s;
+			}
+
+			#error[error] {
+				color: rgba(0, 0, 0, 0.54);
 			}
 
 			svg {
@@ -41,11 +86,11 @@
 			#room-texts * {
 				fill: rgba(0, 0, 0, 0.87);
 				text-anchor: middle;
-				font-size: smaller;
+				font-size: medium;
 			}
 
 			#room-texts .room-name {
-				font-size: medium;
+				font-size: large;
 				font-weight: bold;
 			}
 
@@ -65,8 +110,11 @@
 		<room-planning-data
 			rooms="[[rooms]]"
 			data="{{data}}"
-			refresh-rate="900" />
-		</room-planning-data>
+			period-start="[[currentPeriod.start]]"
+			period-end="[[currentPeriod.end]]"
+			refresh-rate="600"
+			error="{{_errorState}}">
+		</room-planning-data> 
 		<svg viewbox="0 0 603.71875 756.84375">
 			<g id="hallways">
 				<path d="M 276.9715,279.97752 317.89103,255.54093 405.88483,400.2913 442.86034,400.48643 442.86034,407.03585 452.34293,407.11625 452.40493,444.62524 437.83355,452.84728 502.75083,559.63649 525.02573,559.63649 526.16218,257.33408 583.9797,257.43228 583.9999,334.38946 603.22065,334.42966 603.14025,462.56518 584.03349,462.60548 584.05479,543.95312 566.84805,543.89622 566.73474,715.79369 518.07819,715.82529 516.24169,680.5324 z"/>
@@ -124,6 +172,11 @@
 				<path d="M 565.75794,293.9107 608.75161,293.9837"/>
 			</g>
 		</svg>
+		<ul id='legend'>
+			<li class="free">Salle libre</li>
+			<li class="occupied">Salle occupée</li>
+		</ul>
+		<p id='error' error$="{{_errorState}}">Données inaccessibles.</p>
 	</template>
 	<script>
 		'use strict';
@@ -150,13 +203,23 @@
 					value: null,
 					observer: '_update'
 				},
+				currentPeriod: {
+					type: Object,
+					value: null
+				},
+				_errorState: {
+					type: Boolean,
+					value: false
+				}
 			},
 			ready: function () {
 				var This = this;
 
+				this._setPeriod();
 				this._eachTime('second', function (now) {
 					This._update(null, null, now);
 				});
+				this._eachTime('day', this._setPeriod.bind(this));
 			},
 			_update: function (newValue, oldValue, now) {
 				now = now || moment();
@@ -189,6 +252,7 @@
 				function getNextEnd(room) {
 					var nextEnd = null;
 
+					this.data[room] = this.data[room] || [];
 					this.data[room].sort(function (a, b) {
 						return moment(a.end) - moment(b.end);
 					});
@@ -223,6 +287,14 @@
 				} else if (roomState.state === 'free') {
 					return roomState.start ? 'à ' + moment(roomState.start).format('H:mm') : '';
 				}
+			},
+			_setPeriod: function (now) {
+				now = now || moment();
+
+				this.currentPeriod = {
+					start: now.startOf('day').format(),
+					end: now.endOf('day').format()
+				};
 			},
 			_eachTime: function (time, callback) {
 				var now = moment();

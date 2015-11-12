@@ -13,10 +13,13 @@
 			handle-as='json'
 			last-response='{{_data}}'
 			debounce-duration='50'
+			on-response='_onResponse'
+			on-error='_onError'
 		></iron-ajax>
 	</template>
 	<script>
 		'use strict';
+
 		Polymer({
 			is: 'room-planning-data',
 			properties: {
@@ -45,7 +48,19 @@
 					type: Object,
 					notify: true,
 					readOnly: true
+				},
+				error: {
+					type: Boolean,
+					value: false,
+					readOnly: true,
+					notify: true
 				}
+			},
+			_onResponse: function () {
+				this._setError(false);
+			},
+			_onError: function () {
+				this._setError(true);
 			},
 			_computeRequestParameters: function (rooms, periodStart, periodEnd) {
 				var params = {
@@ -62,12 +77,12 @@
 			_refreshRateChanged: function (newRefreshRate) {
 				if (this._refreshIntervalId !== null) {
 					clearInterval(this._refreshIntervalId);
+					this._refreshIntervalId = null;
 				}
 				if (newRefreshRate && newRefreshRate > 0) {
 					var This = this;
 					this._refreshIntervalId = setInterval(function () {
 						This.$.ajax.params = This._computeRequestParameters(This.rooms, This.periodStart, This.periodEnd);
-						This.$.ajax.generateRequest();
 					}, newRefreshRate * 1000);
 				}
 			}
