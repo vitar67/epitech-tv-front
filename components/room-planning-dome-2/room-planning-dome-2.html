@@ -219,7 +219,7 @@
 				this._eachTime('second', function (now) {
 					This._update(null, null, now);
 				});
-				this._eachTime('day', this._setPeriod.bind(this));
+				this._eachTime('hour', this._setPeriod.bind(this));
 			},
 			_update: function (newValue, oldValue, now) {
 				now = now || moment();
