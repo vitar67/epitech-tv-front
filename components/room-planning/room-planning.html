@@ -1,0 +1,148 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../momentjs/momentjs.html">
+<link rel="import" href="../room-planning-data/room-planning-data.html">
+<link rel="import" href="room-planning-room-column.html">
+<!-- <link rel="import" href="../jquery-2.1.4/jquery-2.1.4.html"> -->
+
+<dom-module id="room-planning">
+	<template>
+		<style>
+			:host {
+				padding: 8px;
+				display: flex;
+				position: relative;
+			}
+
+			room-planning-room-column {
+				flex: 1;
+			}
+		</style>
+		<room-planning-data
+			rooms="[[rooms]]"
+			data="{{data}}"
+			period-start="[[currentPeriod.start]]"
+			period-end="[[currentPeriod.end]]"
+			refresh-rate="600"
+			error="{{_errorState}}">
+		</room-planning-data>
+		<template is="dom-repeat" items="[[rooms]]" as="room">
+			<room-planning-room-column
+				room="[[room]]"
+				data="[[_roomData(data, room)]]"
+				day-start="[[_dayStart]]"
+				day-end="[[_dayEnd]]">
+			</room-planning-room-column>
+		</template>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'room-planning',
+			properties: {
+				rooms: {
+					type: Array,
+					value: []
+				},
+				data: {
+					type: Object
+				},
+				currentPeriod: {
+					type: Object,
+					value: null
+				},
+				startOfDay: {
+					type: String,
+					computed: '_minStart(data)'
+				},
+				endOfDay: {
+					type: String,
+					computed: '_maxStart(data)'
+				},
+				_dayStart: {
+					type: Object,
+					computed: '_durationOf(startOfDay)'
+				},
+				_dayEnd: {
+					type: Object,
+					computed: '_durationOf(endOfDay)'
+				},
+				_errorState: {
+					type: Boolean,
+					value: false
+				}
+			},
+			ready: function () {
+				var This = this;
+
+				this._setPeriod();
+				this._eachTime('second', function (now) {
+					//This._update(null, null, now);
+				});
+				this._eachTime('day', this._setPeriod.bind(this));
+			},
+			_roomData: function(data, room) {
+				return (data || {})[room] || [];
+			},
+			_setPeriod: function (now) {
+				now = now || moment();
+
+				this.currentPeriod = {
+					start: now.startOf('day').format(),
+					end: now.endOf('day').format()
+				};
+			},
+			_eachTime: function (time, callback) {
+				var now = moment();
+				var next = moment(now);
+				var This = this;
+
+				next.endOf(time);
+				setTimeout(function () {
+					callback(next);
+					This._eachTime(time, callback);
+				}, next - now);
+			},
+			_durationOf: function (duration) {
+				return moment.duration(duration);
+			},
+			_minStart: function(data) {
+				var now = moment();
+				var dayStart = moment(now).startOf('day');
+				var min = moment(now).endOf('day');
+
+				for (var room in data) {
+					for (var i in data[room]) {
+						var start = moment(data[room][i].start);
+
+						if (start.isBefore(min) && start.isAfter(dayStart)) {
+							min = start;
+						} else if (start.isSame(dayStart) || start.isBefore(dayStart)) {
+							return dayStart.format('H.mm');
+						}
+					}
+				}
+				return min;
+			},
+			_maxStart: function(data) {
+				var now = moment();
+				var dayEnd = moment(now).endOf('day');
+				var max = moment(now).startOf('day');
+
+				for (var room in data) {
+					for (var i in data[room]) {
+						var end = moment(data[room][i].end);
+
+						if (end.isAfter(max) && end.isBefore(dayEnd)) {
+							max = end;
+						} else if (end.isSame(dayEnd) || end.isAfter(dayEnd)) {
+							return dayEnd.format('H.mm');
+						}
+					}
+				}
+				return max;
+			}
+,
+		});
+	</script>
+</dom-module>

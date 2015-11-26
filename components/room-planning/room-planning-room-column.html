@@ -1,0 +1,137 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../momentjs/momentjs.html">
+<link rel="import" href="room-planning-event.html">
+
+<dom-module id="room-planning-room-column">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
+
+			h1 {
+				display: block;
+				text-align: center;
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-size: 22px;
+				height: 24px;
+				flex: 0 0 auto;
+				font-weight: normal;
+			}
+
+			#event-container {
+				flex: 1 1 auto;
+				position: relative;
+			}
+
+			room-planning-event.iseg::shadow #event {
+				background-color: #c62828;
+			}
+
+			room-planning-event.epitech::shadow #event {
+				background-color: #0277bd;
+			}
+
+			.hourMark {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				box-sizing: border-box;
+				border-top: 1px solid rgba(0, 0, 0, 0.12);
+			}
+
+			room-planning-event {
+				position: absolute;
+				width: 100%;
+				box-sizing: border-box;
+			}
+		</style>
+		<h1>[[room]]</h1>
+		<div id="event-container">
+			<template is="dom-repeat" items="[[_hourBounds]]" as="bound">
+				<div class="hourMark" style$="[[_boundStyle(bound)]]"></div>
+			</template>
+			<template is="dom-repeat" items="[[data]]" as="event">
+				<room-planning-event class$="[[event.owner]]" style$="[[_eventStyle(event, dayStart, dayEnd)]]">
+					<h1>[[event.title]]</h1>
+					<h2>[[event.course]]</h2>
+					<time><span>[[_timeString(event.start)]]</span> – <span>[[_timeString(event.end)]]</span></time>
+				</room-planning-evert>
+			</template>
+		</div>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'room-planning-room-column',
+			properties: {
+				room: {
+					type: String
+				},
+				dayStart: {
+					type: Object
+				},
+				dayEnd: {
+					type: Object
+				},
+				data: {
+					type: Object,
+				},
+				_hourBounds: {
+					type: Array,
+					computed: '_computeHourBounds(dayStart, dayEnd)'
+				}
+			},
+			_durationString: function (duration) {
+				return (moment().startOf('day').add(duration)).format('H:mm');
+			},
+			_computeHourBounds: function(dayStart, dayEnd) {
+				var t = moment.duration(dayStart.hours(), 'hours');
+				var bounds = [];
+
+				while (t < dayStart)
+					t.add(1, 'hour');
+				while (t < dayEnd) {
+					bounds.push({
+						percentage: 100.0 * ((t - dayStart) / (dayEnd - dayStart)),
+						representation: moment().startOf('day').add(t).format('H:mm')
+					});
+					t.add(1, 'hour');
+				}
+				return bounds;
+			},
+			_boundStyle: function(bound) {
+				return 'top:' + bound.percentage + '%';
+			},
+			_eventStyle: function(event, dayStart, dayEnd) {
+				var duration;
+				var start;
+				var end;
+				var day;
+				var today;
+
+				today = moment().startOf('day');
+				dayStart = moment(today).add(dayStart);
+				dayEnd = moment(today).add(dayEnd);
+				day = dayEnd - dayStart;
+				start = moment(event.start) - dayStart;
+				end = moment(event.end) - dayStart;
+				if (start < 0)
+					start = 0;
+				if (end > day)
+					end = day;
+				duration = end - start;
+				return 'top:' + (100 * start / day) + '%;height:' + (100 * duration / day) + '%';
+			},
+			_timeString: function (time) {
+				if (typeof(time) === 'string')
+					time = moment(time);
+				return time.format('H:mm');
+			}
+		});
+	</script>
+</dom-module>
