@@ -51,13 +51,21 @@
 					type: Object,
 					value: null
 				},
+				defaultStartOfDay: {
+					type: String,
+					value: '8:00'
+				},
+				defaultEndOfDay: {
+					type: String,
+					value: '20:00'
+				},
 				startOfDay: {
 					type: String,
 					computed: '_minStart(data)'
 				},
 				endOfDay: {
 					type: String,
-					computed: '_maxStart(data)'
+					computed: '_maxEnd(data)'
 				},
 				_dayStart: {
 					type: Object,
@@ -109,7 +117,7 @@
 			_minStart: function(data) {
 				var now = moment();
 				var dayStart = moment(now).startOf('day');
-				var min = moment(now).endOf('day');
+				var min = moment(now).startOf('day').add(moment.duration(this.defaultStartOfDay));
 
 				for (var room in data) {
 					for (var i in data[room]) {
@@ -124,10 +132,10 @@
 				}
 				return min;
 			},
-			_maxStart: function(data) {
+			_maxEnd: function(data) {
 				var now = moment();
 				var dayEnd = moment(now).endOf('day');
-				var max = moment(now).startOf('day');
+				var max = moment(now).startOf('day').add(moment.duration(this.defaultEndOfDay));;
 
 				for (var room in data) {
 					for (var i in data[room]) {
