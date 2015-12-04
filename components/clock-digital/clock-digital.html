@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../momentjs/momentjs.html">
+<link rel="import" href="../clock-data/clock-data.html">
 
 <dom-module id="clock-digital">
 	<template>
@@ -40,34 +41,37 @@
 				margin-top: 0
 			}
 		</style>
+		<clock-data auto-start current="{{now}}"></clock-data>
 		<time id="clock">
-			<p id="time"><span id="major"></span><span id="minor"></span></p>
-			<p id="date"></p>
+			<p id="time"><span id="major">[[formatted.major]]</span><span id="minor">[[formatted.minor]]</span></p>
+			<p id="date">[[formatted.date]]</p>
 		</time>
 	</template>
 	<script>
 		'use strict';
 		Polymer({
 			is: 'clock-digital',
-			ready: function () {
-				this._update();
+			properties: {
+				now: {
+					type: String,
+					value: moment().format()
+				},
+				formatted: {
+					type: Object,
+					computed: 'format(now)'
+				}
 			},
-			_update: function () {
-				var now = moment();
-				var next = moment(now);
-				var This = this;
+			format: function (time) {
+				time = moment(time);
+				return {
+					major: time.format('H:mm'),
+					minor: time.format('ss'),
+					date: capitalizeDay(time.format('dddd D MMMM YYYY'))
+				};
 
-				next.endOf("second");
-				setTimeout(function () {
-					var date;
-
-					date = next.format('dddd D MMMM YYYY');
-					date = date.charAt(0).toUpperCase() + date.slice(1);
-					This.$.major.innerHTML = next.format('H:mm');
-					This.$.minor.innerHTML = next.format('ss');
-					This.$.date.innerHTML = date;
-					This._update();
-				}, next - now);
+				function capitalizeDay(dateString) {
+					return dateString.charAt(0).toUpperCase() + dateString.slice(1);
+				}
 			}
 		});
 	</script>
