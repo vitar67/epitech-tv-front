@@ -11,6 +11,11 @@
 				align-content: center;
 			}
 
+			time {
+				margin: 16px;
+				display: block;
+			}
+
 			#clock {
 				text-align: center;
 			}
@@ -26,11 +31,19 @@
 				color: rgba(0, 0, 0, 0.54);
 				vertical-align: sub;
 			}
+
+			#date {
+				margin-bottom: 0
+			}
+
+			#time {
+				margin-top: 0
+			}
 		</style>
-		<div id="clock">
+		<time id="clock">
 			<p id="time"><span id="major"></span><span id="minor"></span></p>
 			<p id="date"></p>
-		</div>
+		</time>
 	</template>
 	<script>
 		'use strict';
