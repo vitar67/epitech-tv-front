@@ -1,0 +1,136 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../clock-data/clock-data.html">
+<link rel="import" href="../momentjs/momentjs.html">
+
+<dom-module id="clock-countdown">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				flex-flow: column nowrap;
+				justify-content: center;
+				align-items: center;
+			}
+
+			:host > ::content > h1 {
+				margin: 0;
+				font-size: 16px;
+				font-weight: normal;
+			}
+
+			#countdown {
+				display: flex;
+				flex-flow: row nowrap;
+				margin-bottom: 12px;
+			}
+
+			time {
+				font-weight: lighter;
+				font-size: 48px;
+				margin: 0;
+				margin-left: 1em;
+				order: 1;
+				margin-bottom: -10px;
+			}
+
+			h2 {
+				font-weight: normal;
+				font-size: 16px;
+				margin: 0;
+				order: 2;
+				color: rgba(0, 0, 0, 0.54);
+				text-transform: uppercase;
+			}
+
+			.component {
+				min-width: 72px;
+				display: flex;
+				flex-flow: column nowrap;
+				align-items: flex-end;
+			}
+
+			.component:first-of-type {
+				min-width: 0;
+			}
+
+			.component:first-of-type > time {
+				margin-left: 0;
+			}
+		</style>
+		<clock-data
+			auto-start
+			current="{{now}}"
+		></clock-data>
+		<div id="countdown">
+			<template is="dom-repeat" items="{{components}}" as="component">
+				<div class="component">
+					<h2>[[component.component]]</h2>
+					<time>[[component.value]]</time>
+				</div>
+			</template>
+		</div>
+		<content select="h1"></content>
+	</template>
+	<script>
+		'use strict';
+		Polymer({
+			is: 'clock-countdown',
+			properties: {
+				end: {
+					type: String,
+					value: '2038-01-19T03:14:08Z'
+				},
+				remaining: {
+					type: Number,
+					computed: 'computeRemaining(now, end)'
+				},
+				components: {
+					type: Object,
+					computed: 'decompose(remaining)'
+				},
+				now: {
+					type: String,
+					value: null
+				},
+				json: {
+					type: String,
+					computed: 'test(components)'
+				}
+			},
+			computeRemaining: function (now, end) {
+				return Math.abs(moment(end) - moment(now));
+			},
+			test: function (components) {
+				return JSON.stringify(components);
+			},
+			decompose: function (remaining) {
+				var components;
+				remaining = moment.duration(remaining);
+
+				components =  [
+					{ component: 'Jours', value: zeroPad(Math.floor(remaining.asDays()), 2) },
+					{ component: 'Heures', value: zeroPad(remaining.hours(), 2) },
+					{ component: 'Minutes', value: zeroPad(remaining.minutes(), 2) },
+					{ component: 'Secondes', value: zeroPad(remaining.seconds(), 2) }
+				];
+
+				for (var i in components) {
+					if (/^0*1$/.test(components[i].value)) {
+						components[i].component = components[i].component.slice(0, -1);
+					}
+				}
+
+				return components;
+	
+				function zeroPad(number, padding) {
+					var significantChars = '' + number;
+
+					while (significantChars.length < padding) {
+						significantChars = '0' + significantChars;
+					}
+					return significantChars;
+				}
+			}
+		});
+	</script>
+</dom-module>
