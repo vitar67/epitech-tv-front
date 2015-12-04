@@ -1,0 +1,87 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../momentjs/momentjs.html">
+
+<script>
+	'use strict';
+	Polymer({
+		is: 'clock-data',
+		properties: {
+			current: {
+				type: String,
+				readOnly: true,
+				notify: true,
+				value: null
+			},
+			next: {
+				type: String,
+				readOnly: true,
+				notify: true,
+				value: null
+			},
+			interval: {
+				type: String,
+				value: 'P0Y0M0DT0H0M1S'
+			},
+			offset: {
+				type: String,
+				value: 'P0Y0M0DT0H0M0S'
+			},
+			autoStart: {
+				type: Boolean,
+				value: false
+			}
+		},
+		observers: [
+			'settingsChanged(interval, offset)'
+		],
+		ready: function () {
+			if (this.autoStart) {
+				this.start();
+			}
+		},
+		nextUpdateHandle: null,
+		start: function () {
+			if (this.nextUpdateHandle === null) {
+				(update.bind(this))(moment(), true);
+			}
+
+			function update(time, dryRun) {
+				var next;
+
+				next = this.nextUpdate(time);
+				if (!dryRun) {
+					this._setCurrent(time.format());
+					this._setNext(next.format());
+					this.fire('tick', {
+						time: time.format(),
+						next: next.format()
+					});
+				}
+				this.nextUpdateHandle = window.setTimeout(update.bind(this, next), next - moment());
+			}
+		},
+		stop: function () {
+			if (this.nextUpdateHandle !== null) {
+				window.clearTimeout(this.nextUpdateHandle);
+			}
+		},
+		settingsChanged: function (interval, offset) {
+			this.restart();
+		},
+		restart: function () {
+			this.stop();
+			this.start();
+		},
+		nextUpdate: function (now) {
+			var next;
+			var interval;
+			var offset;
+
+			interval = +moment.duration(this.interval || '');
+			offset = +moment.duration(this.offset || '');
+			now = +(now || moment());
+			next = now - now % interval + interval + offset;
+			return moment(next);
+		}
+	});
+</script>
