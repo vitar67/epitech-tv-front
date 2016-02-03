@@ -23,14 +23,14 @@
 			interval="P0Y0M1DT0H0M0S">
 		</clock-data>
 		<room-planning-data
-			rooms="[[rooms]]"
+			rooms="[[_allRooms(rooms, backupRooms)]]"
 			data="{{data}}"
 			period-start="[[currentPeriod.start]]"
 			period-end="[[currentPeriod.end]]"
 			refresh-rate="600"
 			error="{{_errorState}}">
 		</room-planning-data>
-		<template is="dom-repeat" items="[[rooms]]" as="room">
+		<template is="dom-repeat" items="[[shownRooms]]" as="room">
 			<room-planning-room-column
 				room="[[room]]"
 				data="[[_roomData(data, room)]]"
@@ -49,6 +49,18 @@
 				rooms: {
 					type: Array,
 					value: []
+				},
+				backupRooms: {
+					type: Array,
+					value: []
+				},
+				shownRooms: {
+					type: Array,
+					computed: '_shownRooms(rooms, backupRooms, backupTags, data)'
+				},
+				backupTags: {
+					type: Array,
+					value: ['sm']
 				},
 				data: {
 					type: Object
@@ -71,11 +83,11 @@
 				},
 				startOfDay: {
 					type: String,
-					computed: '_minStart(data, defaultStartOfDay)'
+					computed: '_minStart(data, shownRooms, defaultStartOfDay)'
 				},
 				endOfDay: {
 					type: String,
-					computed: '_maxEnd(data, defaultEndOfDay)'
+					computed: '_maxEnd(data, shownRooms, defaultEndOfDay)'
 				},
 				_dayStart: {
 					type: Object,
@@ -93,6 +105,26 @@
 			ready: function() {
 				lol = this;
 			},
+			_allRooms: function(rooms, backupRooms) {
+				return rooms.concat(backupRooms);
+			},
+			_shownRooms: function(rooms, backupRooms, backupTags, data) {
+				var roomData = this._roomData.bind(this)
+				var backupTagsRegex = backupTags.map(function (tag) {
+					return new RegExp(':' + tag + ':', 'i');
+				});
+				rooms = rooms.slice();
+				backupRooms.forEach(function (room) {
+					if (roomData(data, room).some(function (ev) {
+						return backupTagsRegex.some(function (tag) {
+							return tag.test(ev.title);
+						});
+					})) {
+						rooms.push(room);
+					}
+				});
+				return rooms;
+			},
 			_roomData: function(data, room) {
 				return (data || {})[room] || [];
 			},
@@ -108,14 +140,16 @@
 			_durationOf: function (duration) {
 				return moment.duration(duration);
 			},
-			_minStart: function(data, defaultStartOfDay) {
+			_minStart: function(data, shownRooms, defaultStartOfDay) {
 				var now = moment();
 				var dayStart = moment(now).startOf('day');
 				var min = moment(now).startOf('day').add(moment.duration(defaultStartOfDay));
 
-				for (var room in data) {
-					for (var i in data[room]) {
-						var start = moment(data[room][i].start);
+				for (var r in shownRooms) {
+					var room = shownRooms[r];
+					var roomData = this._roomData(data, room);
+					for (var i in roomData) {
+						var start = moment(roomData[i].start);
 
 						if (start.isBefore(min) && start.isAfter(dayStart)) {
 							min = start;
@@ -126,14 +160,16 @@
 				}
 				return min;
 			},
-			_maxEnd: function(data, defaultEndOfDay) {
+			_maxEnd: function(data, shownRooms, defaultEndOfDay) {
 				var now = moment();
 				var dayEnd = moment(now).endOf('day');
-				var max = moment(now).startOf('day').add(moment.duration(defaultEndOfDay));;
+				var max = moment(now).startOf('day').add(moment.duration(defaultEndOfDay));
 
-				for (var room in data) {
-					for (var i in data[room]) {
-						var end = moment(data[room][i].end);
+				for (var r in shownRooms) {
+					var room = shownRooms[r];
+					var roomData = this._roomData(data, room);
+					for (var i in roomData) {
+						var end = moment(roomData[i].end);
 
 						if (end.isAfter(max) && end.isBefore(dayEnd)) {
 							max = end;

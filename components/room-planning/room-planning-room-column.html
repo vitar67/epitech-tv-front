@@ -56,7 +56,7 @@
 			</template>
 			<template is="dom-repeat" items="[[data]]" as="event">
 				<room-planning-event class$="[[event.owner]]" style$="[[_eventStyle(event, dayStart, dayEnd)]]">
-					<h1>[[event.title]]</h1>
+					<h1>[[_stripTitle(event.title)]]</h1>
 					<h2>[[event.course]]</h2>
 					<time><span>[[_timeString(event.start)]]</span> – <span>[[_timeString(event.end)]]</span></time>
 				</room-planning-evert>
@@ -85,6 +85,9 @@
 					type: Array,
 					computed: '_computeHourBounds(dayStart, dayEnd)'
 				}
+			},
+			_stripTitle: function(title) {
+				return title.replace(/\s*:(?:\w*:)+/, '');
 			},
 			_durationString: function (duration) {
 				return (moment().startOf('day').add(duration)).format('H:mm');
