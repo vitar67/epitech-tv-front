@@ -17,6 +17,11 @@
 				flex: 1;
 			}
 		</style>
+		<clock-data
+			auto-start
+			current="{{currentDay}}"
+			interval="P0Y0M1DT0H0M0S">
+		</clock-data>
 		<room-planning-data
 			rooms="[[rooms]]"
 			data="{{data}}"
@@ -35,6 +40,7 @@
 		</template>
 	</template>
 	<script>
+		var lol;
 		'use strict';
 
 		Polymer({
@@ -47,9 +53,13 @@
 				data: {
 					type: Object
 				},
+				currentDay: {
+					type: String,
+					value: moment().format()
+				},
 				currentPeriod: {
 					type: Object,
-					value: null
+					computed: '_currentPeriod(currentDay)'
 				},
 				defaultStartOfDay: {
 					type: String,
@@ -61,11 +71,11 @@
 				},
 				startOfDay: {
 					type: String,
-					computed: '_minStart(data)'
+					computed: '_minStart(data, defaultStartOfDay)'
 				},
 				endOfDay: {
 					type: String,
-					computed: '_maxEnd(data)'
+					computed: '_maxEnd(data, defaultEndOfDay)'
 				},
 				_dayStart: {
 					type: Object,
@@ -80,44 +90,28 @@
 					value: false
 				}
 			},
-			ready: function () {
-				var This = this;
-
-				this._setPeriod();
-				this._eachTime('second', function (now) {
-					//This._update(null, null, now);
-				});
-				this._eachTime('day', this._setPeriod.bind(this));
+			ready: function() {
+				lol = this;
 			},
 			_roomData: function(data, room) {
 				return (data || {})[room] || [];
 			},
-			_setPeriod: function (now) {
-				now = now || moment();
+			_currentPeriod: function(currentDay) {
+				currentDay = moment(currentDay);
 
-				this.currentPeriod = {
-					start: now.startOf('day').format(),
-					end: now.endOf('day').format()
+				console.log("Computing new currentPeriod for day " + currentDay + ".");
+				return {
+					start: currentDay.startOf('day').format(),
+					end: currentDay.endOf('day').format()
 				};
-			},
-			_eachTime: function (time, callback) {
-				var now = moment();
-				var next = moment(now);
-				var This = this;
-
-				next.endOf(time);
-				setTimeout(function () {
-					callback(next);
-					This._eachTime(time, callback);
-				}, next - now);
 			},
 			_durationOf: function (duration) {
 				return moment.duration(duration);
 			},
-			_minStart: function(data) {
+			_minStart: function(data, defaultStartOfDay) {
 				var now = moment();
 				var dayStart = moment(now).startOf('day');
-				var min = moment(now).startOf('day').add(moment.duration(this.defaultStartOfDay));
+				var min = moment(now).startOf('day').add(moment.duration(defaultStartOfDay));
 
 				for (var room in data) {
 					for (var i in data[room]) {
@@ -132,10 +126,10 @@
 				}
 				return min;
 			},
-			_maxEnd: function(data) {
+			_maxEnd: function(data, defaultEndOfDay) {
 				var now = moment();
 				var dayEnd = moment(now).endOf('day');
-				var max = moment(now).startOf('day').add(moment.duration(this.defaultEndOfDay));;
+				var max = moment(now).startOf('day').add(moment.duration(defaultEndOfDay));;
 
 				for (var room in data) {
 					for (var i in data[room]) {
@@ -150,7 +144,6 @@
 				}
 				return max;
 			}
-,
 		});
 	</script>
 </dom-module>
