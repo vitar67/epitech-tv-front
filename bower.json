@@ -25,8 +25,8 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "~1.2.0",
-    "moment": "momentjs#~2.10.6",
-    "iron-ajax": "PolymerElements/iron-ajax#~1.0.7"
+    "polymer": "=1.2.0",
+    "moment": "momentjs#=2.10.6",
+    "iron-ajax": "PolymerElements/iron-ajax#=1.0.7"
   }
 }
