@@ -35,19 +35,22 @@
 					type: String,
 					value: null
 				},
+				tags: { // If set, filters events by tags
+					type: Array,
+					value: null
+				},
 				refreshRate: { // A Number, representing the refresh frequency in seconds. Zero means no automatic refresh.
 					type: Number,
 					value: null,
 					observer: '_refreshRateChanged'
 				},
 				_data: { // I need this intermediate variable because roomData should be readOnly.
-					type: Object,
-					observer: '_dataChanged'
+					type: Object
 				},
 				data: {
 					type: Object,
 					notify: true,
-					readOnly: true
+					computed: '_processData(_data, tags)'
 				},
 				error: {
 					type: Boolean,
@@ -70,8 +73,19 @@
 				};
 				return params;
 			},
-			_dataChanged: function (newData) {
-				this._setData(newData);
+			_processData: function (data, tags) {
+				if (tags === null) {
+					return data;
+				} else {
+					var r;
+					var o = {};
+					var tr = tags.map(function (tag) { return new RegExp(':' + tag + ':', 'i'); });
+
+					for (r in data) {
+						o[r] = data[r].filter(function (e) { return tr.some(function (t) { return t.test(e.title); }) });
+					}
+					return o;
+				}
 			},
 			_refreshIntervalId: null,
 			_refreshRateChanged: function (newRefreshRate) {
