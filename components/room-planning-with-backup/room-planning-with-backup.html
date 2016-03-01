@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../room-planning/room-planning.html">
+<link rel="import" href="../room-planning-backup/room-planning-backup.html">
+
+<dom-module id="room-planning-with-backup">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				flex-flow: column nowrap;
+				justify-content: stretch;
+			}
+
+			:host > * {
+				position: relative;
+				flex-grow: 1;
+				flex-shrink: 0;
+			}
+
+			:host > room-planning-backup {
+				flex-grow: 0;
+			}
+		</style>
+		<room-planning
+			rooms="[[rooms]]"
+			backup-rooms="[[columnBackupRooms]]">
+		</room-planning>
+		<room-planning-backup
+			rooms="[[textBackupRooms]]">
+		</room-planning-backup>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'room-planning-with-backup',
+			properties: {
+				rooms: {
+					type: Array
+				},
+				columnBackupRooms: {
+					type: Array,
+					value: []
+				},
+				textBackupRooms: {
+					type: Array,
+					value: []
+				}
+			}
+		});
+	</script>
+</dom-module>

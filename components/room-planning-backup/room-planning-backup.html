@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../momentjs/momentjs.html">
+<link rel="import" href="../room-planning-data/room-planning-data.html">
+
+<dom-module id="room-planning-backup">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				position: relative;
+			}
+
+			p {
+				padding: 8px;
+			}
+		</style>
+		<clock-data
+			auto-start
+			current="{{_now}}"
+			interval="P0Y0M0DT0H0M1S">
+		</clock-data>
+		<room-planning-data
+			rooms="[[rooms]]"
+			data="{{_data}}"
+			period-start="[[currentPeriod.start]]"
+			period-end="[[currentPeriod.end]]"
+			refresh-rate="600"
+			error="{{_errorState}}"
+			tags="[[backupTags]]">
+		</room-planning-data>
+		<template is="dom-if" if="[[_backup.exists]]">
+			<p>Salles machines supplémentaires : <span>[[_backup.pretty]]</span></p>
+		</template>
+	</template>
+	<script>
+		'use strict';
+
+		Polymer({
+			is: 'room-planning-backup',
+			properties: {
+				rooms: {
+					type: Array,
+					value: []
+				},
+				backupTags: {
+					type: Array,
+					value: ['sm']
+				},
+				backupTags: {
+					type: Array,
+					value: ['sm']
+				},
+				_backup: {
+					type: Object,
+					computed: '_currentBackups(_data, _now)'
+				},
+				_data: {
+					type: Object
+				},
+				_now: {
+					type: String,
+					value: moment().format()
+				},
+				_currentPeriod: {
+					type: Object,
+					computed: '_computePeriod(_now)'
+				},
+				_errorState: {
+					type: Boolean
+				}
+			},
+			_debugDisp: function(_data) {
+				return JSON.stringify(_data);
+			},
+			_roomData: function(data, room) {
+				return (data || {})[room] || [];
+			},
+			_computePeriod: function(currentDay) {
+				currentDay = moment(currentDay, moment.ISO_8601);
+
+				return {
+					start: currentDay.startOf('day').format(),
+					end: currentDay.endOf('day').format()
+				};
+			},
+			_currentBackups: function (data, now) {
+				var r;
+				var b = [];
+
+				now = moment(now, moment.ISO_8601);
+
+				for (r in data) {
+					var room = data[r];
+					var current = room.filter(function (ev) {
+						var evStart = moment(ev.start, moment.ISO_8601);
+						var evEnd = moment(ev.end, moment.ISO_8601);
+
+						return (now.isSame(evStart) || now.isAfter(evStart)) && (now.isSame(evEnd) || now.isBefore(evEnd));
+					});
+
+					if (current.length > 0) {
+						b.push(r);
+					}
+				}
+				b = b.sort();
+				var out = {
+					rooms: b,
+					exists: b.length > 0,
+					pretty: b.join(', ')
+				};
+				return out;
+			},
+			_durationOf: function (duration) {
+				return moment.duration(duration);
+			}
+		});
+	</script>
+</dom-module>
