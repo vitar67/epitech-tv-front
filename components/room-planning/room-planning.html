@@ -83,11 +83,11 @@
 				},
 				startOfDay: {
 					type: String,
-					computed: '_minStart(data, shownRooms, defaultStartOfDay)'
+					computed: '_minStart(currentDay, data, shownRooms, defaultStartOfDay)'
 				},
 				endOfDay: {
 					type: String,
-					computed: '_maxEnd(data, shownRooms, defaultEndOfDay)'
+					computed: '_maxEnd(currentDay, data, shownRooms, defaultEndOfDay)'
 				},
 				_dayStart: {
 					type: Object,
@@ -131,7 +131,6 @@
 			_currentPeriod: function(currentDay) {
 				currentDay = moment(currentDay);
 
-				console.log("Computing new currentPeriod for day " + currentDay + ".");
 				return {
 					start: currentDay.startOf('day').format(),
 					end: currentDay.endOf('day').format()
@@ -140,8 +139,8 @@
 			_durationOf: function (duration) {
 				return moment.duration(duration);
 			},
-			_minStart: function(data, shownRooms, defaultStartOfDay) {
-				var now = moment();
+			_minStart: function(currentDay, data, shownRooms, defaultStartOfDay) {
+				var now = moment(currentDay, moment.ISO_8601);
 				var dayStart = moment(now).startOf('day');
 				var min = moment(now).startOf('day').add(moment.duration(defaultStartOfDay));
 
@@ -154,14 +153,14 @@
 						if (start.isBefore(min) && start.isAfter(dayStart)) {
 							min = start;
 						} else if (start.isSame(dayStart) || start.isBefore(dayStart)) {
-							return dayStart.format('H.mm');
+							return dayStart;
 						}
 					}
 				}
 				return min;
 			},
-			_maxEnd: function(data, shownRooms, defaultEndOfDay) {
-				var now = moment();
+			_maxEnd: function(currentDay, data, shownRooms, defaultEndOfDay) {
+				var now = moment(currentDay, moment.ISO_8601);
 				var dayEnd = moment(now).endOf('day');
 				var max = moment(now).startOf('day').add(moment.duration(defaultEndOfDay));
 
@@ -174,7 +173,7 @@
 						if (end.isAfter(max) && end.isBefore(dayEnd)) {
 							max = end;
 						} else if (end.isSame(dayEnd) || end.isAfter(dayEnd)) {
-							return dayEnd.format('H.mm');
+							return dayEnd;
 						}
 					}
 				}
