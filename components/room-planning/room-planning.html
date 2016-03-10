@@ -40,7 +40,6 @@
 		</template>
 	</template>
 	<script>
-		var lol;
 		'use strict';
 
 		Polymer({
@@ -101,9 +100,6 @@
 					type: Boolean,
 					value: false
 				}
-			},
-			ready: function() {
-				lol = this;
 			},
 			_allRooms: function(rooms, backupRooms) {
 				return rooms.concat(backupRooms);
