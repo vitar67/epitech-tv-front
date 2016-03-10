@@ -229,6 +229,9 @@
 				});
 				this._eachTime('hour', this._setPeriod.bind(this));
 			},
+			_stripTitle: function(title) {
+				return title.replace(/\s*:(?:\w*:)+/, '');
+			},
 			_update: function (newValue, oldValue, now) {
 				now = now || moment();
 
@@ -285,7 +288,7 @@
 				if (roomState.title === null) {
 					return '';
 				} else {
-					return roomState.title;
+					return this._stripTitle(roomState.title);
 				}
 			},
 			_roomTime: function (roomState) {
